@@ -2,7 +2,7 @@
 location_ids_1 = []
 location_ids_2 = []
 
-File.foreach("sample_input.txt") do |line|
+File.foreach("puzzle_input.txt") do |line|
     location_ids = line.chomp.split("   ")
 
     location_ids_1.push(location_ids[0].to_i)
