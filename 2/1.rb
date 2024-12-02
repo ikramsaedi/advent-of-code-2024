@@ -5,12 +5,22 @@ def parse_reports_from_file
     end
 end
 
-def get_trend(i, report)
-    # Bounds check, if there's only one report or smth then there's no change
+# Gets diff between 2 adjacentlevels of a report
+def get_diff(i, report)
+    # Bounds check, if there's only one report then there's no change
     return 0 if report.length == 1
     curr_level = report[i]
     next_level = report[i+1]
-    diff = curr_level - next_level
+    
+    return curr_level - next_level
+end
+
+# Diff needs to be within bounds of 1 & 3
+def validate_diff(diff)
+    return diff.abs >= 1 && diff.abs <= 3
+end
+
+def get_trend(diff)
     # Using the combined comparison operator
     # If the difference is pos, it will return 1
     # if the diff is neg, it will return -1
@@ -23,14 +33,21 @@ def get_safety_count(reports)
     reports.each do |report|
         # you need the length and you need the index to access
         is_safe = true
-        og_trend = get_trend(0, report)
+
+        diff = get_diff(0, report)
+        og_trend = get_trend(diff)
+
         for i in 0..report.length do
             break if i + 1 >= report.length
-            curr_trend = get_trend(i, report)
 
-            if curr_trend != og_trend
+            diff = get_diff(i, report)
+            unless validate_diff(diff)
                 is_safe = false
+                break
             end
+
+            curr_trend = get_trend(diff)
+            is_safe = false if curr_trend != og_trend
         end
 
         safety_count+= 1 if is_safe
