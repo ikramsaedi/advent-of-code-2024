@@ -28,6 +28,25 @@ def get_trend(diff)
     return diff <=> 0
 end
 
+
+def report_safety_check(report, og_trend)
+    is_safe = true
+    for i in 0..report.length do
+        break if i + 1 >= report.length
+
+        diff = get_diff(i, report)
+        unless validate_diff(diff)
+            is_safe = false
+            break
+        end
+
+        curr_trend = get_trend(diff)
+        is_safe = false if curr_trend != og_trend
+    end
+
+    is_safe
+end
+
 def get_safety_count(reports)
     safety_count = 0
     reports.each do |report|
@@ -35,19 +54,7 @@ def get_safety_count(reports)
 
         diff = get_diff(0, report)
         og_trend = get_trend(diff)
-
-        for i in 0..report.length do
-            break if i + 1 >= report.length
-
-            diff = get_diff(i, report)
-            unless validate_diff(diff)
-                is_safe = false
-                break
-            end
-
-            curr_trend = get_trend(diff)
-            is_safe = false if curr_trend != og_trend
-        end
+        is_safe = report_safety_check(report, og_trend)
 
         safety_count+= 1 if is_safe
     end
