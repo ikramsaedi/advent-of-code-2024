@@ -1,5 +1,5 @@
 def parse_reports_from_file
-    file = File.open("sample_input.txt")
+    file = File.open("puzzle_input.txt")
     file.readlines.map do |line|
         levels = line.chomp.split(" ").map {|n| n.to_i}
     end
@@ -31,7 +31,6 @@ end
 
 def report_safety_check(report, og_trend)
     is_safe = true
-    unsafe_index = nil
     # iterate through report
     for i in 0..report.length do
         break if i + 1 >= report.length
@@ -39,19 +38,17 @@ def report_safety_check(report, og_trend)
         diff = get_diff(i, report)
         unless validate_diff(diff)
             is_safe = false
-            unsafe_index = i
             break
         end
 
         curr_trend = get_trend(diff)
         if curr_trend != og_trend
             is_safe = false
-            unsafe_index = i
             break
         end
     end
 
-    [is_safe, unsafe_index]
+    is_safe
 end
 
 def safety_check_without_unsafe_level(unsafe_index, report)
@@ -62,7 +59,7 @@ def safety_check_without_unsafe_level(unsafe_index, report)
     diff = get_diff(0, cloned_report)
     og_trend = get_trend(diff)
     
-    return report_safety_check(cloned_report, og_trend)[0]
+    return report_safety_check(cloned_report, og_trend)
 end
 
 def get_safety_count(reports)
@@ -72,21 +69,15 @@ def get_safety_count(reports)
 
         diff = get_diff(0, report)
         og_trend = get_trend(diff)
-        safety_check_result = report_safety_check(report, og_trend)
-        is_safe = safety_check_result[0]
+        is_safe = report_safety_check(report, og_trend)
 
         unless is_safe
-            # BAD ERROR IDK HOW WE WLD GET HERE
-            unsafe_index = safety_check_result[1]
-            if !unsafe_index.is_a?(Integer)
-                raise 
-            end
 
-            is_safe = safety_check_without_unsafe_level(unsafe_index, report)
-
-            # should try with either index
-            unless is_safe
-                is_safe = safety_check_without_unsafe_level(unsafe_index + 1, report)
+            for i in 0..report.length do
+                if safety_check_without_unsafe_level(i, report)
+                    is_safe = true
+                    break
+                end
             end
         end
 
