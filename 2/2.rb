@@ -1,5 +1,5 @@
 def parse_reports_from_file
-    file = File.open("puzzle_input.txt")
+    file = File.open("sample_input.txt")
     file.readlines.map do |line|
         levels = line.chomp.split(" ").map {|n| n.to_i}
     end
@@ -31,20 +31,26 @@ end
 
 def report_safety_check(report, og_trend)
     is_safe = true
+    unsafe_index = nil
     for i in 0..report.length do
         break if i + 1 >= report.length
 
         diff = get_diff(i, report)
         unless validate_diff(diff)
             is_safe = false
+            unsafe_index = i
             break
         end
 
         curr_trend = get_trend(diff)
-        is_safe = false if curr_trend != og_trend
+        if curr_trend != og_trend
+            is_safe = false
+            unsafe_index = i
+            break
+        end
     end
 
-    is_safe
+    [is_safe, unsafe_index]
 end
 
 def get_safety_count(reports)
@@ -54,7 +60,21 @@ def get_safety_count(reports)
 
         diff = get_diff(0, report)
         og_trend = get_trend(diff)
-        is_safe = report_safety_check(report, og_trend)
+        safety_check_result = report_safety_check(report, og_trend)
+        is_safe = safety_check_result[0]
+
+        unless is_safe
+            # BAD ERROR IDK HOW WE WLD GET HERE
+            unsafe_index = safety_check_result[1]
+            if !unsafe_index.is_a?(Integer)
+                raise 
+            end
+
+            cloned_report = report.clone
+            cloned_report.delete_at(unsafe_index)
+            new_safety_check_result = report_safety_check(cloned_report, og_trend)
+            is_safe = new_safety_check_result[0]
+        end
 
         safety_count+= 1 if is_safe
     end
