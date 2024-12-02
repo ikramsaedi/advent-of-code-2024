@@ -32,6 +32,7 @@ end
 def report_safety_check(report, og_trend)
     is_safe = true
     unsafe_index = nil
+    # iterate through report
     for i in 0..report.length do
         break if i + 1 >= report.length
 
@@ -53,6 +54,17 @@ def report_safety_check(report, og_trend)
     [is_safe, unsafe_index]
 end
 
+def safety_check_without_unsafe_level(unsafe_index, report)
+    cloned_report = report.clone
+    cloned_report.delete_at(unsafe_index)
+
+    # og trend needs to update for the new cloned report
+    diff = get_diff(0, cloned_report)
+    og_trend = get_trend(diff)
+    
+    return report_safety_check(cloned_report, og_trend)[0]
+end
+
 def get_safety_count(reports)
     safety_count = 0
     reports.each do |report|
@@ -70,10 +82,12 @@ def get_safety_count(reports)
                 raise 
             end
 
-            cloned_report = report.clone
-            cloned_report.delete_at(unsafe_index)
-            new_safety_check_result = report_safety_check(cloned_report, og_trend)
-            is_safe = new_safety_check_result[0]
+            is_safe = safety_check_without_unsafe_level(unsafe_index, report)
+
+            # should try with either index
+            unless is_safe
+                is_safe = safety_check_without_unsafe_level(unsafe_index + 1, report)
+            end
         end
 
         safety_count+= 1 if is_safe
