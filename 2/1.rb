@@ -1,5 +1,5 @@
 def parse_reports_from_file
-    file = File.open("sample_input.txt")
+    file = File.open("puzzle_input.txt")
     file.readlines.map do |line|
         levels = line.chomp.split(" ").map {|n| n.to_i}
     end
@@ -31,7 +31,6 @@ end
 def get_safety_count(reports)
     safety_count = 0
     reports.each do |report|
-        # you need the length and you need the index to access
         is_safe = true
 
         diff = get_diff(0, report)
