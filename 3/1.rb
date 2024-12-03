@@ -1,4 +1,4 @@
-file = File.open("sample_input.txt")
+file = File.open("puzzle_input.txt")
 
 regex = /mul\((\d+),(\d+)\)/
 sums = file.readlines.map do |line|
