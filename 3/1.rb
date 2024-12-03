@@ -1,11 +1,16 @@
-sample = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
+file = File.open("sample_input.txt")
 
 regex = /mul\((\d+),(\d+)\)/
+sums = file.readlines.map do |line|
+  multiplying_factors = line.scan(regex)
 
-multiplying_factors = sample.scan(regex)
+  multiples = multiplying_factors.map do |factors|
+    factors[0].to_i * factors[1].to_i
+  end
 
-multiples = multiplying_factors.map do |factors|
-  factors[0].to_i * factors[1].to_i
+  multiples.sum
 end
 
-pp multiples.sum
+final_sum = sums.sum
+
+pp final_sum
